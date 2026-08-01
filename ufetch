@@ -13,7 +13,6 @@ UPTIME_H="$(uptime -p | awk '{ print $2 }')"
 UPTIME_M="$(uptime -p | awk '{ print $4 }')"
 PACKAGES="$(pacman -Q | wc -l)"
 SHELL_I="$(basename $SHELL)"
-LOCALE="$(printf $LANG)"
 RAM="$(($(cat /proc/meminfo | grep ^MemTotal: | sed 's/MemTotal: *//' | sed 's/kB//')/1024))"
 FREE_RAM="$(($RAM-$(cat /proc/meminfo | grep ^MemAvailable: | sed 's/MemAvailable: *//' | sed 's/kB//')/1024))"
 SWAP="$(($(cat /proc/meminfo | grep ^SwapTotal: | sed 's/SwapTotal: *//' | sed 's/kB//')/1024))"
@@ -32,51 +31,23 @@ if [[ $CPU_BRUTE == "Intel(R) Core(TM)" ]]; then
     CPU="$(grep ^model\ name /proc/cpuinfo | awk '{ print $6, $8, $9}' | head -n 1) ($CPU_CORES)"
 fi
 
-if [ -z "${WM}" ]; then
-	if [ "${XDG_CURRENT_DESKTOP}" ]; then
-		ENVTYPE='DE'
-		WM="${XDG_CURRENT_DESKTOP}"
-	elif [ "${DESKTOP_SESSION}" ]; then
-		ENVTYPE='DE'
-		WM="${DESKTOP_SESSION}"
-	else
-		ENVTYPE='WM'
-		WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
-	fi
-else
-	ENVTYPE='WM'
-fi
+BOLD="$(printf "\033[1m")" ; BLACK="$(printf "\033[30m")" ; RED="$(printf "\033[31m")"
+GREEN="$(printf "\033[32m")" ; YELLOW="$(printf "\033[33m")" ; BLUE="$(printf "\033[34m")"
+MAGENTA="$(printf "\033[35m")" ; CYAN="$(printf "\033[36m")" ; WHITE="$(printf "\033[37m")"
+RESET="$(printf "\033[0m")" ; UNDERLINE="$(printf "\033[4m")"
 
-BOLD="$(printf "\033[1m")"
-BLACK="$(printf "\033[30m")"
-RED="$(printf "\033[31m")"
-GREEN="$(printf "\033[32m")"
-YELLOW="$(printf "\033[33m")"
-BLUE="$(printf "\033[34m")"
-MAGENTA="$(printf "\033[35m")"
-CYAN="$(printf "\033[36m")"
-WHITE="$(printf "\033[37m")"
-RESET="$(printf "\033[0m")"
-UNDERLINE="$(printf "\033[4m")"
-
-LABELS="${RESET}${BOLD}${CYAN}"
-USER_N_HOST="${RESET}${BOLD}${CYAN}"
-INFO="${RESET}${BOLD}${WHITE}"
-COLOR_0="${RESET}${BOLD}${CYAN}"
-COLOR_1="${RESET}${CYAN}"
+INFO="${RESET}${BOLD}${WHITE}" ; COLOR_0="${RESET}${BOLD}${CYAN}" ; COLOR_1="${RESET}${CYAN}"
 
 cat <<EOF
                      
-${COLOR_0}         .           ${LABELS}${UNDERLINE}${USERNAME}@${HOSTNAME}${RESET}${USER_EUID}
-${COLOR_0}        / \\          ${LABELS}OS:${INFO}        ${OS}${RESET}
-${COLOR_0}       /   \\         ${LABELS}KERNEL:${INFO}    ${KERNEL}${RESET}
-${COLOR_0}      /^.   \\        ${LABELS}UPTIME:${INFO}    ${UPTIME_H}:${UPTIME_M}${RESET}
-${COLOR_0}     /  .-.  \\       ${LABELS}PACKAGES:${INFO}  ${PACKAGES}${RESET}
-${COLOR_0}    /  (   ) _\\      ${LABELS}SHELL:${INFO}     ${SHELL_I}${RESET}
-${COLOR_0}   / _.~   ~._^\\     ${LABELS}${ENVTYPE}:${INFO}        ${WM}${RESET}
-${COLOR_0}  /.^         ^.\\    ${COLOR_0}LOCALE:${INFO}    ${LOCALE}${RESET}
-                     ${COLOR_0}CPU:${INFO}       ${CPU}${RESET}
-                     ${COLOR_0}RAM:${INFO}       ${FREE_RAM} MiB / ${RAM} MiB${RESET}
-                     ${COLOR_0}SWAP:${INFO}      ${SWAP_FREE} MiB / ${SWAP} MiB${RESET} 
+${COLOR_0}         .           ${UNDERLINE}${USERNAME}@${HOSTNAME}${RESET}${USER_EUID}
+${COLOR_0}        / \\          OS:        ${INFO}${OS}${RESET}
+${COLOR_0}       /   \\         KERNEL:    ${INFO}${KERNEL}${RESET}
+${COLOR_0}      /^.   \\        UPTIME:    ${INFO}${UPTIME_H}:${UPTIME_M}${RESET}
+${COLOR_0}     /  .-.  \\       PACKAGES:  ${INFO}${PACKAGES}${RESET}
+${COLOR_0}    /  (   ) _\\      SHELL:     ${INFO}${SHELL_I}${RESET}
+${COLOR_0}   / _.~   ~._^\\     CPU:       ${INFO}${CPU}${RESET}
+${COLOR_0}  /.^         ^.\\    RAM:       ${INFO}${FREE_RAM} MiB / ${RAM} MiB${RESET} 
+${COLOR_0}                     SWAP:      ${INFO}${SWAP_FREE} MiB / ${SWAP} MiB${RESET}
 
 EOF
