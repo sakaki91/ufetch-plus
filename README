@@ -1,0 +1,17 @@
+ufetch-plus.
+============
+a small system information utility for Linux systems.  
+
+~ $ ufetch 
+                     
+        /\          sakaki@arch(1000)
+       /^^\         OS:        Arch Linux
+      /\   \        KERNEL:    Linux 7.1.5-arch1-2
+     /  __  \       UPTIME:    2:08
+    /  (  )  \      PACKAGES:  499
+   / __|  |__\\     SHELL:     bash
+  ///        \\\    CPU:       Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz (4)
+                    RAM:       3870 MiB / 15939 MiB 
+                    SWAP:      0 MiB / 8165 MiB
+
+~ $
