@@ -6,18 +6,15 @@
 # Copyright (c) 2026 João Vitor Duarte <sakaki@tuta.io>
   # (Due to subsequent modifications based on Joe Schillinger's work).
 
-USERNAME="$(basename $HOME)" ; HOSTNAME="$(cat /etc/hostname)"
-OS="$(grep ^NAME= /etc/os-release | sed 's/NAME=//' | tr -d '"')"
-KERNEL="$(awk '{ print $1, $3 }' /proc/version)"
-UPTIME_H="$(uptime -p | awk '{ print $2 }')"
-UPTIME_M="$(uptime -p | awk '{ print $4 }')"
-PACKAGES="$(pacman -Q | wc -l)"
-SHELL_I="$(basename $SHELL)"
-RAM="$(($(cat /proc/meminfo | grep ^MemTotal: | sed 's/MemTotal: *//' | sed 's/kB//')/1024))"
-FREE_RAM="$(($RAM-$(cat /proc/meminfo | grep ^MemAvailable: | sed 's/MemAvailable: *//' | sed 's/kB//')/1024))"
-SWAP="$(($(cat /proc/meminfo | grep ^SwapTotal: | sed 's/SwapTotal: *//' | sed 's/kB//')/1024))"
-SWAP_FREE="$(($SWAP-$(cat /proc/meminfo | grep ^SwapFree: | sed 's/SwapFree: *//' | sed 's/kB//')/1024))"
+# mainly info:
 
+UFETCH_PLUS_VERSION="1.1"
+
+if [[ $1 == "--version" || $1 == "-v" ]]; then
+    printf "ufetch-plus-$UFETCH_PLUS_VERSION\n"
+    printf "Copyright (c) 2026 Sakaki <sakaki@tuta.io>\n"
+    exit
+fi
 
 if [[ $EUID == 0 ]]; then
     USER_EUID="$(printf "(\033[1;91m$EUID\033[0m)")"
@@ -25,29 +22,88 @@ else
     USER_EUID="$(printf "(\033[1m$EUID\033[0m)")"
 fi
 
+USERNAME="$(basename $HOME)"
+HOSTNAME="$(cat /etc/hostname)"
+
+OS="$(grep ^NAME= /etc/os-release | sed 's/NAME=//' | tr -d '"')"
+KERNEL="$(awk '{ print $1, $3 }' /proc/version)"
+UPTIME_H="$(uptime -p | awk '{ print $2 }')"
+UPTIME_M="$(uptime -p | awk '{ print $4 }')"
+SHELL_I="$(basename $SHELL)"
+RAM="$(($(cat /proc/meminfo | grep ^MemTotal: | sed 's/MemTotal: *//' | sed 's/kB//')/1024))"
+FREE_RAM="$(($RAM-$(cat /proc/meminfo | grep ^MemAvailable: | sed 's/MemAvailable: *//' | sed 's/kB//')/1024))"
+SWAP="$(($(cat /proc/meminfo | grep ^SwapTotal: | sed 's/SwapTotal: *//' | sed 's/kB//')/1024))"
+SWAP_FREE="$(($SWAP-$(cat /proc/meminfo | grep ^SwapFree: | sed 's/SwapFree: *//' | sed 's/kB//')/1024))"
+
+
 CPU_BRUTE="$(grep ^model\ name /proc/cpuinfo | awk '{ print $4, $5 }' | head -n 1)"
 CPU_CORES="$(grep ^cpu\ cores /proc/cpuinfo | awk '{ print $4 }' | head -n 1)"
 if [[ $CPU_BRUTE == "Intel(R) Core(TM)" ]]; then
     CPU="$(grep ^model\ name /proc/cpuinfo | awk '{ print $6, $8, $9}' | head -n 1) ($CPU_CORES)"
 fi
 
-BOLD="$(printf "\033[1m")" ; BLACK="$(printf "\033[30m")" ; RED="$(printf "\033[31m")"
-GREEN="$(printf "\033[32m")" ; YELLOW="$(printf "\033[33m")" ; BLUE="$(printf "\033[34m")"
-MAGENTA="$(printf "\033[35m")" ; CYAN="$(printf "\033[36m")" ; WHITE="$(printf "\033[37m")"
-RESET="$(printf "\033[0m")" ; UNDERLINE="$(printf "\033[4m")"
+BOLD="$(printf "\033[1m")"
+BLACK="$(printf "\033[30m")"
+RED="$(printf "\033[31m")"
+GREEN="$(printf "\033[32m")"
+YELLOW="$(printf "\033[33m")"
+BLUE="$(printf "\033[34m")"
+MAGENTA="$(printf "\033[35m")"
+CYAN="$(printf "\033[36m")"
+WHITE="$(printf "\033[37m")"
+RESET="$(printf "\033[0m")"
+UNDERLINE="$(printf "\033[4m")"
 
-INFO="${RESET}${BOLD}${WHITE}" ; COLOR_0="${RESET}${BOLD}${CYAN}" ; COLOR_1="${RESET}${CYAN}"
+INFO="${RESET}${BOLD}${WHITE}"
+
+if [[ $OS == "Alpine Linux" ]]; then
+    COLOR_0=${RESET}${BOLD}$BLUE ; COLOR_1="${RESET}$WHITE"
+    PACKAGES="$(apk info | wc -l)"
+    LINE1="${COLOR_0}     /\ /\         "
+    LINE2="${COLOR_0}    /${COLOR_1}/ ${COLOR_0}\  \       "
+    LINE3="${COLOR_0}   /${COLOR_1}/   ${COLOR_0}\  \      "
+    LINE4="${COLOR_0}  /${COLOR_1}//    ${COLOR_0}\  \     "
+    LINE5="${COLOR_0}  ${COLOR_1}//      ${COLOR_0}\  \\    "
+    LINE6="${COLOR_0}           \  \   "
+    LINE7="${COLOR_0}            \     "
+    LINE8="${COLOR_0}                  "
+    LINE9="${COLOR_0}                  "
+elif [[ $OS == "Arch Linux" ]]; then
+    COLOR_0=${RESET}${BOLD}${CYAN} ; COLOR_1="${RESET}${CYAN}"
+    PACKAGES="$(pacman -Q | wc -l)"
+    LINE1="${COLOR_0}        /\          "
+    LINE2="${COLOR_0}       /^^\        "
+    LINE3="${COLOR_0}      /\   \       "
+    LINE4="${COLOR_0}     /  ${COLOR_1}__  \      ${COLOR_0}"
+    LINE5="${COLOR_1}    /  (  )  \     ${COLOR_0}"
+    LINE6="${COLOR_1}   / __|  |__\\\\    ${COLOR_0}"
+    LINE7="${COLOR_1}  ///        \\\\\   ${COLOR_0}"
+    LINE8="${COLOR_0}                   "
+    LINE9="${COLOR_0}                   "
+else
+    COLOR_0="${RESET}${BOLD}${WHITE}" ; COLOR_1=${RESET}${WHITE} ; COLOR_2=${RESET}${YELLOW}
+    PACKAGES="unknown"
+    LINE1="${COLOR_0}      ___       ${COLOR_0}"
+    LINE2="${COLOR_0}     (${COLOR_1}.. ${COLOR_0}\     ${COLOR_0}"
+    LINE3="${COLOR_0}     (${COLOR_2}<> ${COLOR_0}|     ${COLOR_0}"
+    LINE4="${COLOR_0}    /${COLOR_1}/  \\ ${COLOR_0}\\    ${COLOR_0}"
+    LINE5="${COLOR_0}   ( ${COLOR_1}|  | ${COLOR_0}/|   ${COLOR_0}"
+    LINE6="${COLOR_2}  _${COLOR_0}/\\ ${COLOR_1}__)${COLOR_0}/${COLOR_2}_${COLOR_0})   ${COLOR_0}"
+    LINE7="${COLOR_2}  \/${COLOR_0}-____${COLOR_2}\/${RESET}    ${COLOR_0}"
+    LINE8="${COLOR_0}               ${COLOR_0}"
+    LINE9="${COLOR_0}               ${COLOR_0}"
+fi
 
 cat <<EOF
                      
-${COLOR_0}         .           ${UNDERLINE}${USERNAME}@${HOSTNAME}${RESET}${USER_EUID}
-${COLOR_0}        / \\          OS:        ${INFO}${OS}${RESET}
-${COLOR_0}       /   \\         KERNEL:    ${INFO}${KERNEL}${RESET}
-${COLOR_0}      /^.   \\        UPTIME:    ${INFO}${UPTIME_H}:${UPTIME_M}${RESET}
-${COLOR_0}     /  .-.  \\       PACKAGES:  ${INFO}${PACKAGES}${RESET}
-${COLOR_0}    /  (   ) _\\      SHELL:     ${INFO}${SHELL_I}${RESET}
-${COLOR_0}   / _.~   ~._^\\     CPU:       ${INFO}${CPU}${RESET}
-${COLOR_0}  /.^         ^.\\    RAM:       ${INFO}${FREE_RAM} MiB / ${RAM} MiB${RESET} 
-${COLOR_0}                     SWAP:      ${INFO}${SWAP_FREE} MiB / ${SWAP} MiB${RESET}
+${LINE1}${UNDERLINE}${USERNAME}@${HOSTNAME}${RESET}${USER_EUID}
+${LINE2} OS:        ${INFO}${OS}${RESET}
+${LINE3} KERNEL:    ${INFO}${KERNEL}${RESET}
+${LINE4} UPTIME:    ${INFO}${UPTIME_H}:${UPTIME_M}${RESET}
+${LINE5} PACKAGES:  ${INFO}${PACKAGES}${RESET}
+${LINE6} SHELL:     ${INFO}${SHELL_I}${RESET}
+${LINE7} CPU:       ${INFO}${CPU}${RESET}
+${LINE8} RAM:       ${INFO}${FREE_RAM} MiB / ${RAM} MiB${RESET} 
+${LINE9} SWAP:      ${INFO}${SWAP_FREE} MiB / ${SWAP} MiB${RESET}
 
 EOF
