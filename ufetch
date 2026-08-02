@@ -67,7 +67,7 @@ elif [[ $OS == "Arch Linux" ]]; then
     LINE7="${COLOR_1}  ///        \\\\\   ${COLOR_0}"
     LINE8="${COLOR_0}                   "
     LINE9="${COLOR_0}                   "
-elif [[ $OS == "Debian" ]]; then
+elif [[ $OS == "Debian GNU/Linux" ]]; then
     COLOR_0=${RESET}${BOLD}${RED} ; COLOR_1=${RESET}${RED}
     PACKAGES="$(dpkg -l | wc -l)"
     LINE1="${COLOR_0}    _____     ${COLOR_0}"
