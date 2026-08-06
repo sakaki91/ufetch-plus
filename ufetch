@@ -6,7 +6,7 @@
 # Copyright (c) 2026 João Vitor Duarte <sakaki@tuta.io>
   # (Due to subsequent modifications based on Joe Schillinger's work).
 
-UFETCH_PLUS_VERSION="2.0"
+UFETCH_PLUS_VERSION="3.0"
 
 if [[ $EUID == 0 ]]; then
     USER_EUID="$(printf "(\033[1;91m$EUID\033[0m)")"
@@ -42,6 +42,7 @@ INFO="${RESET}${BOLD}${WHITE}"
 #OS="Linux"
 #OS="Alpine Linux"
 #OS="Debian"
+#OS="Void Linux"
 
 if [[ $OS == "Alpine Linux" ]]; then
     COLOR_0=${RESET}${BOLD}$BLUE ; COLOR_1=${RESET}$WHITE
@@ -79,6 +80,18 @@ elif [[ $OS == "Debian GNU/Linux" ]]; then
     LINE7="${COLOR_0}             ${COLOR_0}"
     LINE8="${COLOR_0}             ${COLOR_0}"
     LINE9="${COLOR_0}             ${COLOR_0}"
+elif [[ $OS == "Void Linux" ]]; then
+    PACKAGES="$(xbps-query -l | wc -l)"
+    COLOR_0=${RESET}${BOLD}${GREEN} ; COLOR_1=${RESET}${GREEN}
+    LINE1="${COLOR_0}      _______       ${COLOR_0}"
+    LINE2="${COLOR_1}      ${COLOR_0}\_____ \`-    ${COLOR_0}"
+    LINE3="${COLOR_1}   /\   ${COLOR_0}___ \`- \   ${COLOR_0}"
+    LINE4="${COLOR_1}  | |  ${COLOR_0}/   \  | |  ${COLOR_0}"
+    LINE5="${COLOR_1}  | |  ${COLOR_0}\___/  | |  ${COLOR_0}"
+    LINE6="${COLOR_1}   \ \`-_____  ${COLOR_0}\/   ${COLOR_0}"
+    LINE7="${COLOR_1}    \`-______\      ${COLOR_0}"
+    LINE8="${COLOR_0}                   ${COLOR_0}"
+    LINE9="${COLOR_0}                   ${COLOR_0}"
 else
     COLOR_0=${RESET}${BOLD}${WHITE} ; COLOR_1=${RESET}${WHITE} ; COLOR_2=${RESET}${YELLOW}
     PACKAGES="unknown"
@@ -93,7 +106,7 @@ else
     LINE9="${COLOR_0}               ${COLOR_0}"
 fi
 
-cat <<EOF
+/bin/cat <<EOF
                      
 ${LINE1}${UNDERLINE}${USERNAME}@${HOSTNAME}${RESET}${USER_EUID}
 ${LINE2} OS:        ${INFO}${OS}${RESET}
